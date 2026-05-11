@@ -7,90 +7,109 @@ export const useLibraryStore = defineStore('library', {
 
   actions: {
 
-    // 📚 agregar libro o sumar copia si ya existe
+    // 📚 agregar libro
     addBook(book) {
-      const existingBook = this.books.find(
-        b => b.title.toLowerCase().trim() === book.title.toLowerCase().trim()
-      )
 
-      // 📦 si ya existe → agregar copia
-      if (existingBook) {
-        existingBook.copies.push({
-          id: Date.now(),
-          status: 'available',
-          borrower: null,
-          date: null
-        })
-
-        return
-      }
-
-      // 📖 crear nuevo libro
       this.books.push({
         ...book,
-
-        copies: [
+        id: Date.now(),
+        copies: book.copies || [
           {
             id: Date.now(),
             status: 'available',
             borrower: null,
-            date: null
+            cedula: null,
+            borrowDate: null,
+            dueDate: null
           }
         ]
       })
     },
 
-    // ➕ agregar copia manual
-    addCopy(bookIndex) {
-      this.books[bookIndex].copies.push({
+    // ➕ agregar copia
+    addCopy(bookId) {
+
+      const book = this.books.find(b => b.id === bookId)
+      if (!book) return
+
+      book.copies.push({
         id: Date.now(),
         status: 'available',
         borrower: null,
-        date: null
+        cedula: null,
+        borrowDate: null,
+        dueDate: null
       })
     },
 
-    // ➖ eliminar SOLO copia disponible
-    removeCopy(bookIndex) {
-      const book = this.books[bookIndex]
+    // ➖ eliminar copia
+    removeCopy(bookId, copyId) {
 
-      // 🚫 no eliminar si solo queda 1 copia
-      if (book.copies.length === 1) {
-        return
+      const book = this.books.find(b => b.id === bookId)
+      if (!book) return
+
+      book.copies = book.copies.filter(c => c.id !== copyId)
+
+      // 📌 eliminar libro si no quedan copias
+      if (book.copies.length === 0) {
+        this.books = this.books.filter(b => b.id !== bookId)
       }
-
-      // 🔎 buscar una disponible
-      const availableIndex = book.copies.findIndex(
-        c => c.status === 'available'
-      )
-
-      // 🚫 si no hay disponibles
-      if (availableIndex === -1) {
-        return
-      }
-
-      // 🗑 eliminar copia
-      book.copies.splice(availableIndex, 1)
     },
 
-    // 🔄 cambiar estado de copia
-    toggleCopyStatus(bookIndex, copyIndex) {
-      const book = this.books[bookIndex]
+    // 📕 PRESTAR LIBRO (desde modal)
+    loanCopy(bookId, copyId, loanData) {
 
-      const copy = book.copies[copyIndex]
+      const book = this.books.find(b => b.id === bookId)
+      if (!book) return
 
-      // 🚫 protección
+      const copy = book.copies.find(c => c.id === copyId)
       if (!copy) return
 
-      if (copy.status === 'available') {
-        copy.status = 'borrowed'
-        copy.borrower = 'Usuario'
-        copy.date = new Date().toISOString().split('T')[0]
-      } else {
-        copy.status = 'available'
-        copy.borrower = null
-        copy.date = null
-      }
+      copy.status = 'borrowed'
+      copy.borrower = loanData.name
+      copy.cedula = loanData.cedula
+      copy.borrowDate = new Date().toISOString().split('T')[0]
+      copy.dueDate = loanData.dueDate
+    },
+
+    // 📤 DEVOLVER LIBRO
+    returnCopy(bookId, copyId) {
+
+      const book = this.books.find(b => b.id === bookId)
+      if (!book) return
+
+      const copy = book.copies.find(c => c.id === copyId)
+      if (!copy) return
+
+      copy.status = 'available'
+      copy.borrower = null
+      copy.cedula = null
+      copy.borrowDate = null
+      copy.dueDate = null
+    },
+
+    // ⏳ DETECTAR VENCIDOS
+    checkOverdue() {
+
+      const today = new Date()
+
+      this.books.forEach(book => {
+        book.copies.forEach(copy => {
+
+          if (
+            copy.status === 'borrowed' &&
+            copy.dueDate
+          ) {
+            const due = new Date(copy.dueDate.replace(/-/g, '/'))
+
+            if (due < today) {
+              copy.status = 'overdue'
+            }
+          }
+
+        })
+      })
     }
+
   }
 })
