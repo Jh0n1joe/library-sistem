@@ -10,9 +10,7 @@ const shelfFilter = ref('')
 const sortBy = ref('')
 const search = ref('')
 
-// ⏱️ reloj reactivo
 const nowTick = ref(Date.now())
-
 let interval = null
 
 onMounted(() => {
@@ -25,22 +23,18 @@ onUnmounted(() => {
   clearInterval(interval)
 })
 
-// 📦 modal
 const showModal = ref(false)
 const selectedBookId = ref(null)
 const selectedCopyId = ref(null)
 
-// 📂 categorías
 const categories = computed(() =>
   [...new Set(store.books.map(b => b.category))]
 )
 
-// 📦 estantes
 const shelves = computed(() =>
   [...new Set(store.books.map(b => b.shelf))]
 )
 
-// 🔄 reset filtros
 function resetFilters() {
   categoryFilter.value = ''
   shelfFilter.value = ''
@@ -48,34 +42,13 @@ function resetFilters() {
   search.value = ''
 }
 
-// 🧠 parser fecha real (meses + días válidos)
 function parseCustomDate(dateStr) {
   if (!dateStr) return null
-
-  const parts = dateStr.split('-')
-  if (parts.length !== 3) return null
-
-  let [dd, mm, yy] = parts.map(Number)
-
-  if (mm < 1 || mm > 12) return null
-  if (dd < 1 || dd > 31) return null
-
-  const year = 2000 + yy
-
-  const date = new Date(year, mm - 1, dd)
-
-  if (
-    date.getFullYear() !== year ||
-    date.getMonth() !== mm - 1 ||
-    date.getDate() !== dd
-  ) {
-    return null
-  }
-
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return null
   return date
 }
 
-// ⏳ tiempo restante
 function getTimeRemaining(dueDate) {
   const due = parseCustomDate(dueDate)
   if (!due) return 'Fecha inválida'
@@ -93,7 +66,6 @@ function getTimeRemaining(dueDate) {
   return `${days}d ${hours}h ${minutes}m restantes`
 }
 
-// 🚨 ALERTAS DE VENCIMIENTO
 function getDueAlert(dueDate) {
   const due = parseCustomDate(dueDate)
   if (!due) return null
@@ -103,31 +75,33 @@ function getDueAlert(dueDate) {
   const hours = diff / (1000 * 60 * 60)
 
   if (diff <= 0) return '🔴 VENCIDO'
-  if (hours <= 24) return '🟠 VENCE EN MENOS DE 24H'
-  if (hours <= 72) return '🟡 VENCE PRONTO'
+  if (hours <= 24) return '🟠 VENCE PRONTO'
+  if (hours <= 72) return '🟡 PRÓXIMO A VENCER'
 
   return null
 }
 
-// 📦 abrir modal
 function openLoanModal(bookId, copyId) {
   selectedBookId.value = bookId
   selectedCopyId.value = copyId
   showModal.value = true
 }
 
-// 📦 recibir préstamo
+function handleAction(bookId, copy) {
+  if (copy.status === 'available') {
+    openLoanModal(bookId, copy.id)
+  }
+}
+
 function handleLoan(data) {
   store.loanCopy(
     selectedBookId.value,
     selectedCopyId.value,
     data
   )
-
   showModal.value = false
 }
 
-// 🔎 filtros
 const filteredBooks = computed(() => {
   let books = store.books
 
@@ -187,105 +161,117 @@ const filteredBooks = computed(() => {
   return books
 })
 
-// 📦 conteo copias
 function getCopyCount(book) {
   return book.copies?.length || 0
 }
 </script>
 
 <template>
-  <div>
+  <div class="page">
 
-    <h2>🔎 Filtros</h2>
+    <!-- 🔎 FILTROS -->
+    <div class="filters-panel">
 
-    <input v-model="search" placeholder="Buscar libro..." />
+      <h2>🔎 Filtros</h2>
 
-    <select v-model="categoryFilter">
-      <option value="">Todas las categorías</option>
-      <option v-for="c in categories" :key="c">
-        {{ c }}
-      </option>
-    </select>
+      <div class="filters-grid">
+        <input v-model="search" placeholder="Buscar libro..." />
 
-    <select v-model="shelfFilter">
-      <option value="">Todos los estantes</option>
-      <option v-for="s in shelves" :key="s">
-        {{ s }}
-      </option>
-    </select>
+        <select v-model="categoryFilter">
+          <option value="">Todas las categorías</option>
+          <option v-for="c in categories" :key="c">{{ c }}</option>
+        </select>
 
-    <select v-model="sortBy">
-      <option value="">Sin orden</option>
-      <option value="title-asc">A - Z</option>
-      <option value="title-desc">Z - A</option>
-      <option value="availability">Disponibilidad</option>
-      <option value="copies">Copias</option>
-      <option value="recent">Recientes</option>
-    </select>
+        <select v-model="shelfFilter">
+          <option value="">Todos los estantes</option>
+          <option v-for="s in shelves" :key="s">{{ s }}</option>
+        </select>
 
-    <button @click="resetFilters">
-      🔄 Reset
-    </button>
+        <select v-model="sortBy">
+          <option value="">Sin orden</option>
+          <option value="title-asc">A - Z</option>
+          <option value="title-desc">Z - A</option>
+          <option value="availability">Disponibilidad</option>
+          <option value="copies">Copias</option>
+          <option value="recent">Recientes</option>
+        </select>
 
-    <hr />
-
-    <!-- 📚 libros -->
-    <div v-for="book in filteredBooks" :key="book.id">
-
-      <p>
-        <b>📖 {{ book.title }}</b>
-        <span v-if="getCopyCount(book) > 1">
-          ({{ getCopyCount(book) }})
-        </span>
-      </p>
-
-      <p>✍️ {{ book.editor }}</p>
-      <p>🏷️ {{ book.category }}</p>
-      <p>📦 Estante: {{ book.shelf }}</p>
-
-      <hr />
-
-      <!-- 📦 copias -->
-      <div v-for="copy in book.copies" :key="copy.id">
-
-        <!-- 🚨 ALERTA -->
-        <p v-if="getDueAlert(copy.dueDate)">
-          {{ getDueAlert(copy.dueDate) }}
-        </p>
-
-        <p v-if="copy.status === 'available'">
-          🟢 Disponible
-        </p>
-
-        <p v-else-if="copy.status === 'borrowed'">
-          🟡 {{ copy.borrower }} ({{ copy.cedula }})
-          <br />
-          📅 vence: {{ copy.dueDate }}
-          <br />
-          ⏳ {{ getTimeRemaining(copy.dueDate) }}
-        </p>
-
-        <p v-else>
-          🔴 Vencido
-        </p>
-
-        <button @click="openLoanModal(book.id, copy.id)">
-          Prestar / Devolver
+        <button @click="resetFilters">
+          🔄 Reset
         </button>
+      </div>
 
-        <button @click="store.addCopy(book.id)">
-          ➕ Agregar
-        </button>
+    </div>
 
-        <button @click="store.removeCopy(book.id, copy.id)">
-          ➖ Quitar
-        </button>
+    <!-- 📚 LIBROS -->
+    <div class="books-container">
+
+      <div
+        class="book-card"
+        v-for="book in filteredBooks"
+        :key="book.id"
+      >
+
+        <div class="book-header">
+          <h3>📖 {{ book.title }}</h3>
+
+          <span v-if="getCopyCount(book) > 1">
+            {{ getCopyCount(book) }} copias
+          </span>
+        </div>
+
+        <p class="meta">✍️ {{ book.editor }}</p>
+        <p class="meta">🏷️ {{ book.category }}</p>
+        <p class="meta">📦 {{ book.shelf }}</p>
+
+        <hr />
+
+        <!-- 📦 COPIAS -->
+        <div
+          class="copy-block"
+          v-for="copy in book.copies"
+          :key="copy.id"
+        >
+
+          <p v-if="getDueAlert(copy.dueDate)">
+            {{ getDueAlert(copy.dueDate) }}
+          </p>
+
+          <p v-if="copy.status === 'available'">
+            🟢 Disponible
+          </p>
+
+          <p v-else-if="copy.status === 'borrowed'">
+            🟡 {{ copy.borrower }} ({{ copy.cedula }})
+            <br />
+            📅 {{ copy.dueDate }}
+            <br />
+            ⏳ {{ getTimeRemaining(copy.dueDate) }}
+          </p>
+
+          <p v-else>
+            🔴 Vencido
+          </p>
+
+          <button @click="handleAction(book.id, copy)">
+            📚 Prestar
+          </button>
+
+          <button @click="store.addCopy(book.id)">
+            ➕ Agregar
+          </button>
+
+          <button @click="store.removeCopy(book.id, copy.id)">
+            ➖ Quitar
+          </button>
+
+        </div>
 
       </div>
 
     </div>
 
-    <!-- modal -->
+    <!-- 📦 MODAL -->
     <LoanModal
       v-if="showModal"
       @close="showModal = false"
@@ -294,3 +280,53 @@ function getCopyCount(book) {
 
   </div>
 </template>
+
+<style scoped>
+.page {
+  background: #f5f7fb;
+  min-height: 100vh;
+  padding: 16px;
+  font-family: Arial, sans-serif;
+}
+
+.filters-panel {
+  background: white;
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.books-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.book-card {
+  background: white;
+  padding: 14px;
+  border-radius: 10px;
+}
+
+.book-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.meta {
+  opacity: 0.7;
+  margin: 2px 0;
+}
+
+.copy-block {
+  margin-top: 10px;
+  padding: 8px;
+  border-left: 3px solid #ddd;
+}
+</style>

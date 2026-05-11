@@ -7,39 +7,59 @@ const name = ref('')
 const cedula = ref('')
 const dueDate = ref('')
 
-// 🚨 estado del popup de error
-const showErrorModal = ref(false)
+// 🌙 modo oscuro sistema
+const isDarkMode =
+  window.matchMedia &&
+  window.matchMedia('(prefers-color-scheme: dark)').matches
+
+// 📅 fecha mínima (hoy)
+const today = new Date().toISOString().split('T')[0]
+
+// 📅 fecha máxima (año 9999)
+const maxDate = '9999-12-31'
+
+// 🚨 error modal
+const showError = ref(false)
 const errorMessage = ref('')
 
 // 👤 solo letras
-function onlyLetters(value) {
-  return value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '')
+function blockNumbersInName(event) {
+  const key = event.key
+
+  if (
+    key === 'Backspace' ||
+    key === 'Delete' ||
+    key === 'ArrowLeft' ||
+    key === 'ArrowRight' ||
+    key === 'Tab'
+  ) return
+
+  if (/[0-9]/.test(key)) {
+    event.preventDefault()
+  }
 }
 
-// 🪪 solo números + max 8
-function onlyNumbers(value) {
-  return value.replace(/[^0-9]/g, '').slice(0, 8)
+// 🪪 solo números
+function blockLettersInCedula(event) {
+  const key = event.key
+
+  if (
+    key === 'Backspace' ||
+    key === 'Delete' ||
+    key === 'ArrowLeft' ||
+    key === 'ArrowRight' ||
+    key === 'Tab'
+  ) return
+
+  if (!/[0-9]/.test(key)) {
+    event.preventDefault()
+  }
 }
 
-// 📅 formato fecha
-function formatDate(value) {
-  let v = value.replace(/[^0-9]/g, '')
-
-  if (v.length > 6) v = v.slice(0, 6)
-
-  let result = ''
-
-  if (v.length > 0) result += v.slice(0, 2)
-  if (v.length >= 3) result += '-' + v.slice(2, 4)
-  if (v.length >= 5) result += '-' + v.slice(4, 6)
-
-  return result
-}
-
-// 🚨 abrir error modal
+// ⚠️ error
 function openError(message) {
   errorMessage.value = message
-  showErrorModal.value = true
+  showError.value = true
 }
 
 // 📦 submit
@@ -66,65 +86,48 @@ function submit() {
 </script>
 
 <template>
-  <div>
 
-    <!-- 📦 MODAL PRINCIPAL -->
-    <div class="modal">
+  <!-- 🌑 MODAL OVERLAY -->
+  <div class="modal-overlay">
 
-      <div class="card">
-
-        <h3>📦 Préstamo</h3>
-
-        <input
-          v-model="name"
-          placeholder="Nombre y apellido"
-          @input="name = onlyLetters(name)"
-        />
-
-        <input
-          v-model="cedula"
-          placeholder="Cédula (máx 8 dígitos)"
-          @input="cedula = onlyNumbers(cedula)"
-          maxlength="8"
-        />
-
-        <input
-          v-model="dueDate"
-          placeholder="DD-MM-YY"
-          @input="dueDate = formatDate(dueDate)"
-          maxlength="8"
-        />
-
-        <div class="actions">
-
-          <button @click="submit">
-            Confirmar
-          </button>
-
-          <button @click="$emit('close')">
-            Cancelar
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- 🚨 MODAL DE ERROR (VENTANA EMERGENTE) -->
     <div
-      v-if="showErrorModal"
-      class="error-modal"
+      class="modal-card"
+      :class="{ dark: isDarkMode }"
     >
 
-      <div class="error-card">
+      <h2>📚 Registrar préstamo</h2>
 
-        <h3>⚠️ Error</h3>
+      <!-- 👤 NOMBRE -->
+      <input
+        v-model="name"
+        @keydown="blockNumbersInName"
+        placeholder="Nombre y apellido del estudiante"
+      />
 
-        <p>{{ errorMessage }}</p>
+      <!-- 🪪 CÉDULA -->
+      <input
+        v-model="cedula"
+        @keydown="blockLettersInCedula"
+        maxlength="8"
+        placeholder="Cédula de identidad"
+      />
 
-        <button @click="showErrorModal = false">
-          Entendido
+      <!-- 📅 FECHA (sin pasado + max 9999) -->
+      <input
+        type="date"
+        v-model="dueDate"
+        :min="today"
+        :max="maxDate"
+      />
+
+      <div class="actions">
+
+        <button @click="$emit('close')">
+          Cancelar
+        </button>
+
+        <button @click="submit">
+          Confirmar
         </button>
 
       </div>
@@ -132,75 +135,90 @@ function submit() {
     </div>
 
   </div>
+
+  <!-- 🚨 ERROR MODAL -->
+  <div v-if="showError" class="error-overlay">
+
+    <div
+      class="error-card"
+      :class="{ dark: isDarkMode }"
+    >
+
+      <h3>⚠️ {{ errorMessage }}</h3>
+
+      <button @click="showError = false">
+        OK
+      </button>
+
+    </div>
+
+  </div>
+
 </template>
 
 <style scoped>
-.modal {
+.modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.6);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 999;
 }
 
-.card {
-  background: white;
+.modal-card {
+  background: #fff;
   color: #111;
   padding: 20px;
-  border-radius: 10px;
-  width: 300px;
+  border-radius: 12px;
+  width: 320px;
+  transition: 0.3s;
+}
+
+.modal-card.dark {
+  background: #1e1e1e;
+  color: #f1f1f1;
+}
+
+.modal-card input {
+  width: 100%;
+  margin: 6px 0;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.modal-card.dark input {
+  background: #2a2a2a;
+  color: white;
+  border: 1px solid #444;
 }
 
 .actions {
   display: flex;
   justify-content: space-between;
+  margin-top: 15px;
 }
 
-/* 🚨 ERROR MODAL BASE */
-.error-modal {
+.error-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.7);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .error-card {
-  background: white;
-  color: #111;
+  background: #fff;
   padding: 20px;
   border-radius: 10px;
-  width: 250px;
-  text-align: center;
-  transition: all 0.3s ease;
 }
 
-/* 🌙 MODO OSCURO AUTOMÁTICO */
-@media (prefers-color-scheme: dark) {
-
-  .card {
-    background: #1e1e1e;
-    color: #f5f5f5;
-  }
-
-  .error-card {
-    background: #2a2a2a;
-    color: #f5f5f5;
-  }
-
-  input {
-    background: #333;
-    color: white;
-    border: 1px solid #555;
-  }
-
-  button {
-    background: #444;
-    color: white;
-    border: none;
-  }
-
+.error-card.dark {
+  background: #222;
+  color: #fff;
 }
 </style>
