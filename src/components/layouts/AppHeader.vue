@@ -1,26 +1,53 @@
 <template>
   <header class="app-header">
 
-    <!-- 🖼️ LOGO -->
-    <div class="logo-container">
-      <img
-        src="/logo.png"
-        alt="Rafael Urdaneta"
-        class="logo"
-      />
+    <!-- 📚 IZQUIERDA -->
+    <div class="left-section">
+
+      <!-- 🖼️ LOGO -->
+      <div class="logo-container">
+        <img
+          :src="logo"
+          alt="Rafael Urdaneta"
+          class="logo"
+        />
+      </div>
+
+      <!-- 📝 TEXTO -->
+      <div class="title-container">
+        <h1>📚 Gestor de Libros</h1>
+        <p>Biblioteca Escolar – Rafael Urdaneta</p>
+      </div>
+
     </div>
 
-    <!-- 📚 TEXTO INSTITUCIONAL -->
-    <div class="title-container">
-      <h1>📚 Gestor de Libros</h1>
-      <p>Biblioteca Escolar – Rafael Urdaneta</p>
+    <!-- 🌙 DERECHA -->
+    <div class="right-section">
+
+      <button
+        class="theme-button"
+        @click="$emit('toggle-theme')"
+      >
+        {{ isDark ? '☀️ Claro' : '🌙 Oscuro' }}
+      </button>
+
     </div>
 
   </header>
 </template>
 
 <script setup>
-// No lógica necesaria por ahora
+
+/* 🖼️ IMPORTAR LOGO */
+import logo from '../../assets/logo_liceo.jpg'
+
+defineProps({
+  isDark: Boolean
+})
+
+defineEmits([
+  'toggle-theme'
+])
 </script>
 
 <style scoped>
@@ -32,11 +59,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-
   padding: 14px 20px;
   background: #1f3a5f; /* azul institucional serio */
   color: white;
-
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
@@ -103,5 +128,54 @@
 
 :global(.page.dark) .title-container p {
   color: #cbd5e1;
+}
+
+/* =========================
+   📦 LADO IZQUIERDO
+   ========================= */
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
+/* =========================
+   📦 LADO DERECHO
+   ========================= */
+.right-section {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+
+/* =========================
+   🔘 BOTÓN DE TEMA
+   ========================= */
+.theme-button {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 15px;
+}
+
+/* ✨ HOVER */
+.theme-button:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+
+/* 🌙 DARK MODE */
+:global(.page.dark) .theme-button {
+  background: #1e293b;
+}
+
+:global(.page.dark) .theme-button:hover {
+  background: #334155;
 }
 </style>

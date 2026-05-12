@@ -1,18 +1,31 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+
+/* =========================
+   🧩 COMPONENTES
+   ========================= */
+import AppHeader from '../components/layouts/AppHeader.vue'
 import BookForm from '../components/BookForm.vue'
 import Filters from '../components/Filters.vue'
 
+/* =========================
+   🌙 ESTADO DE TEMA
+   ========================= */
 const isDark = ref(false)
 const userOverride = ref(false)
 
-// 🌙 detectar sistema
+/* =========================
+   🌙 DETECCIÓN DE SISTEMA
+   ========================= */
 function detectSystemTheme() {
   const media = window.matchMedia('(prefers-color-scheme: dark)')
+
+  // estado inicial
   if (!userOverride.value) {
     isDark.value = media.matches
   }
 
+  // listener cambios del sistema
   media.addEventListener('change', (e) => {
     if (!userOverride.value) {
       isDark.value = e.matches
@@ -20,12 +33,17 @@ function detectSystemTheme() {
   })
 }
 
-// 🔘 toggle manual
+/* =========================
+   🔘 TOGGLE MANUAL
+   ========================= */
 function toggleTheme() {
   userOverride.value = true
   isDark.value = !isDark.value
 }
 
+/* =========================
+   🚀 CICLO DE VIDA
+   ========================= */
 onMounted(() => {
   detectSystemTheme()
 })
@@ -34,25 +52,27 @@ onMounted(() => {
 <template>
   <div :class="['page', { dark: isDark }]">
 
-    <!-- 🏫 HEADER -->
-    <AppHeader />
+    <!-- 🏫 HEADER PRINCIPAL -->
+    <AppHeader
+      :isDark="isDark"
+      @toggle-theme="toggleTheme"
+    />
 
-    <!-- 🌙 TOGGLE -->
-    <div class="theme-toggle">
-      <button @click="toggleTheme">
-        {{ isDark ? '☀️ Modo Claro' : '🌙 Modo Oscuro' }}
-      </button>
-    </div>
-
-    <!-- 📚 CONTENIDO -->
+    <!-- 📚 CONTENIDO PRINCIPAL -->
     <main class="container">
 
-      <h2 class="title">📚 Gestión de Biblioteca</h2>
+      <!-- 🏷️ TÍTULO -->
+      <h2 class="title">
+        📚 Gestión de Biblioteca
+      </h2>
 
+      <!-- 📝 FORMULARIO -->
       <BookForm />
 
+      <!-- ➖ SEPARADOR -->
       <hr />
 
+      <!-- 🔎 FILTROS -->
       <Filters />
 
     </main>
@@ -63,101 +83,66 @@ onMounted(() => {
 <style scoped>
 
 /* =========================
-   🌐 RESET GLOBAL
+   📦 LAYOUT PRINCIPAL
    ========================= */
-:global(body) {
-  margin: 0;
-  padding: 0;
-  background: #84a0d7;
-}
 
+.container {
+  flex: 1;              /* 🔥 CLAVE REAL */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
 
 /* =========================
-   🌞 LAYOUT BASE (MODO CLARO)
+   🎨 TEMA (COLORES BASE)
    ========================= */
+
 .page {
   background: #84a0d7;
-  min-height: 100vh;
-  transition: all 0.3s ease;
-}
-
-/* 📦 CONTENEDOR PRINCIPAL DEL CONTENIDO */
-.container {
-  padding: 45px;
-}
-
-/* 🏷️ TÍTULO PRINCIPAL (GESTIÓN BIBLIOTECA) */
-.title {
-  margin: 10px 0 20px;
-  font-size: 18px;
   color: #ffffff;
 }
 
-/* 📏 LÍNEAS DIVISORIAS (hr) EN MODO CLARO */
-hr {
-  border-color: #d6dee8;
-  margin: 10px;
-}
-
-
-/* =========================
-   🌙 MODO OSCURO (SISTEMA)
-   ========================= */
-
-/* 🌑 FONDO GENERAL EN DARK MODE */
 .page.dark {
   background: #121b30;
   color: #e5e7eb;
 }
 
-/* 🌑 BODY EN DARK MODE */
-:global(body.dark-mode) {
-  background: #121b30;
-}
-
-/* 🏷️ TÍTULO EN MODO OSCURO */
-.page.dark .title {
-  color: #ffffff;
-}
-
-/* 📏 LÍNEAS DIVISORIAS (hr) EN DARK MODE */
-.page.dark hr {
-  border-color: #121b30;
-  margin: 10px;
-}
-
-
 /* =========================
-   🔘 TOGGLE DE TEMA
+   📏 SEPARADORES (HR)
    ========================= */
 
-/* 📍 POSICIÓN DEL BOTÓN DE CAMBIO DE TEMA */
+hr {
+  border: none;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.page.dark hr {
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+
+/* =========================
+   🔘 CONTROLES (TOGGLE)
+   ========================= */
+
 .theme-toggle {
   display: flex;
   justify-content: flex-end;
   padding: 10px 16px;
 }
 
-/* 🔘 BOTÓN DE CAMBIO DE TEMA (MODO CLARO) */
 .theme-toggle button {
   background: #121b30;
   border: none;
   padding: 6px 12px;
   border-radius: 8px;
   color: white;
-  cursor: pointer;
-  transition: 0.2s;
 }
 
-
-/* 🌙 BOTÓN EN MODO OSCURO */
 .page.dark .theme-toggle button {
   background: #5aa9e6;
-}
-
-/* ✨ EFECTO HOVER DEL BOTÓN */
-.theme-toggle button:hover {
-  background: #3b82f6;
 }
 
 </style>
