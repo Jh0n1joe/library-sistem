@@ -24,6 +24,10 @@
 </script>
 
 <style scoped>
+
+/* =========================
+   🏫 HEADER PRINCIPAL (MODO CLARO)
+   ========================= */
 .app-header {
   display: flex;
   align-items: center;
@@ -36,11 +40,19 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
+
+/* =========================
+   🖼️ CONTENEDOR DEL LOGO
+   ========================= */
 .logo-container {
   display: flex;
   align-items: center;
 }
 
+
+/* =========================
+   🏷️ LOGO INSTITUCIONAL
+   ========================= */
 .logo {
   width: 44px;
   height: 44px;
@@ -50,6 +62,10 @@
   padding: 4px;
 }
 
+
+/* =========================
+   📝 TEXTO DEL HEADER
+   ========================= */
 .title-container h1 {
   margin: 0;
   font-size: 18px;
@@ -60,5 +76,32 @@
   margin: 0;
   font-size: 12px;
   opacity: 0.85;
+}
+
+
+/* =========================
+   🌙 MODO OSCURO (SISTEMA GLOBAL)
+   ========================= */
+
+/* 🏫 HEADER EN DARK MODE */
+:global(.page.dark) .app-header {
+  background: #0f172a; /* azul oscuro institucional */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+
+/* 🖼️ LOGO EN DARK MODE (MEJOR CONTRASTE) */
+:global(.page.dark) .logo {
+  background: #e5e7eb;
+}
+
+
+/* 📝 TEXTO EN DARK MODE */
+:global(.page.dark) .title-container h1 {
+  color: #ffffff;
+}
+
+:global(.page.dark) .title-container p {
+  color: #cbd5e1;
 }
 </style>

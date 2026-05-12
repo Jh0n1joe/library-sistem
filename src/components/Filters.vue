@@ -282,6 +282,10 @@ function getCopyCount(book) {
 </template>
 
 <style scoped>
+
+/* =========================
+   🌞 CONTENEDOR GENERAL (PÁGINA)
+   ========================= */
 .page {
   background: #f5f7fb;
   min-height: 100vh;
@@ -289,6 +293,10 @@ function getCopyCount(book) {
   font-family: Arial, sans-serif;
 }
 
+
+/* =========================
+   📦 PANEL DE FILTROS
+   ========================= */
 .filters-panel {
   background: white;
   padding: 14px;
@@ -296,37 +304,90 @@ function getCopyCount(book) {
   margin-bottom: 16px;
 }
 
+
+/* =========================
+   📐 GRID DE FILTROS
+   ========================= */
 .filters-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 10px;
 }
 
+
+/* =========================
+   📚 CONTENEDOR DE LIBROS
+   ========================= */
 .books-container {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
+
+/* =========================
+   📦 TARJETA DE LIBRO
+   ========================= */
 .book-card {
   background: white;
   padding: 14px;
   border-radius: 10px;
 }
 
+
+/* =========================
+   🧾 ENCABEZADO DE LIBRO
+   ========================= */
 .book-header {
   display: flex;
   justify-content: space-between;
 }
 
+
+/* =========================
+   📌 METADATOS (AUTOR, ETC)
+   ========================= */
 .meta {
   opacity: 0.7;
   margin: 2px 0;
 }
 
+
+/* =========================
+   📦 BLOQUE DE COPIAS
+   ========================= */
 .copy-block {
   margin-top: 10px;
   padding: 8px;
   border-left: 3px solid #ddd;
+}
+
+
+/* =========================
+   🌙 MODO OSCURO (SISTEMA GLOBAL)
+   ========================= */
+
+/* 🌑 FONDO GENERAL */
+:global(.page.dark) {
+  background: #121b30;
+  color: #e5e7eb;
+}
+
+
+/* 📦 PANEL DE FILTROS EN DARK MODE */
+:global(.page.dark) .filters-panel {
+  background: #1e293b;
+}
+
+
+/* 📚 TARJETAS DE LIBRO EN DARK MODE */
+:global(.page.dark) .book-card {
+  background: #1e293b;
+  color: #e5e7eb;
+}
+
+/* 📦 BLOQUES DE COPIAS EN DARK MODE */
+:global(.page.dark) .copy-block {
+  border-left: 3px solid #334155;
 }
 </style>
