@@ -52,28 +52,25 @@ onMounted(() => {
 <template>
   <div :class="['page', { dark: isDark }]">
 
-    <!-- 🏫 HEADER PRINCIPAL -->
+    <!-- 🏫 HEADER -->
     <AppHeader
       :isDark="isDark"
       @toggle-theme="toggleTheme"
     />
 
-    <!-- 📚 CONTENIDO PRINCIPAL -->
+    <!-- 🔍 CONTENEDOR PRINCIPAL -->
     <main class="container">
 
-      <!-- 🏷️ TÍTULO -->
-      <h2 class="title">
-        📚 Gestión de Biblioteca
-      </h2>
+      <!-- 🔎 BLOQUE PRINCIPAL (tipo search bar + form) -->
+      <section class="top-section">
+        <h2 class="title">📚 Biblioteca Escolar</h2>
+        <BookForm />
+      </section>
 
-      <!-- 📝 FORMULARIO -->
-      <BookForm />
-
-      <!-- ➖ SEPARADOR -->
-      <hr />
-
-      <!-- 🔎 FILTROS -->
-      <Filters />
+      <!-- 🔧 FILTROS -->
+      <section class="filters-section">
+        <Filters />
+      </section>
 
     </main>
 
@@ -81,68 +78,112 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* =========================
+   🌐 ROOT FULLSCREEN REAL
+   ========================= */
+
+:global(html, body, #app) {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
 
 /* =========================
-   📦 LAYOUT PRINCIPAL
+   📦 APP ROOT
+   ========================= */
+
+.page {
+  min-height: 100vh;   /* 🔥 clave real */
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #84a0d7;
+  color: white;
+
+  overflow-x: hidden;
+}
+
+/* =========================
+   🏫 HEADER FIX (NO SE SUBE NI DESAPARECE)
+   ========================= */
+
+.page > header {
+  flex-shrink: 0;   /* 🔥 evita que se colapse */
+  width: 100%;
+}
+
+/* =========================
+   📦 CONTENIDO
    ========================= */
 
 .container {
-  flex: 1;              /* 🔥 CLAVE REAL */
+  flex: 1;              /* ocupa todo el espacio restante */
+  width: 100%;
+
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
+
   padding: 24px;
-  width: 100%;
   box-sizing: border-box;
 }
 
 /* =========================
-   🎨 TEMA (COLORES BASE)
+   🔝 SECCIONES
    ========================= */
 
-.page {
-  background: #84a0d7;
-  color: #ffffff;
+.top-section,
+.filters-section {
+  width: 100%;
 }
+
+/* =========================
+   🔝 BLOQUE SUPERIOR
+   ========================= */
+
+.top-section {
+  background: rgba(255,255,255,0.12);
+  padding: 25px;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+}
+
+/* =========================
+   🔧 FILTROS
+   ========================= */
+
+.filters-section {
+  background: rgba(255,255,255,0.08);
+  padding: 20px;
+  border-radius: 12px;
+}
+
+/* =========================
+   🏷️ TÍTULO
+   ========================= */
+
+.title {
+  margin-bottom: 12px;
+  font-size: 22px;
+}
+
+/* =========================
+   🌙 DARK MODE
+   ========================= */
 
 .page.dark {
   background: #121b30;
   color: #e5e7eb;
 }
 
-/* =========================
-   📏 SEPARADORES (HR)
-   ========================= */
-
-hr {
-  border: none;
-  border-top: 1px solid rgba(0,0,0,0.1);
+.page.dark .top-section {
+  background: rgba(255,255,255,0.05);
 }
 
-.page.dark hr {
-  border-top: 1px solid rgba(255,255,255,0.15);
+.page.dark .filters-section {
+  background: rgba(255,255,255,0.03);
 }
-
-/* =========================
-   🔘 CONTROLES (TOGGLE)
-   ========================= */
-
-.theme-toggle {
-  display: flex;
-  justify-content: flex-end;
-  padding: 10px 16px;
-}
-
-.theme-toggle button {
-  background: #121b30;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 8px;
-  color: white;
-}
-
-.page.dark .theme-toggle button {
-  background: #5aa9e6;
-}
-
 </style>

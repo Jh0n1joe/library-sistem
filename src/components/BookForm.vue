@@ -63,8 +63,9 @@ function addBook() {
 <style scoped>
 
 /* =========================
-   📦 CONTENEDOR PRINCIPAL (FORMULARIO)
+   📦 CONTENEDOR PRINCIPAL
    ========================= */
+
 .form {
   background: rgb(255, 255, 255);
   padding: 15px;
@@ -74,8 +75,9 @@ function addBook() {
 
 
 /* =========================
-   🏷️ TÍTULO DEL FORMULARIO
+   🏷️ TÍTULO
    ========================= */
+
 .title {
   margin-bottom: 15px;
   font-size: 25px;
@@ -85,8 +87,9 @@ function addBook() {
 
 
 /* =========================
-   ✏️ CAMPOS DE ENTRADA (INPUTS)
+   ✏️ INPUTS
    ========================= */
+
 input {
   display: block;
   width: 100%;
@@ -94,12 +97,14 @@ input {
   padding: 10px;
   border: 3px solid #ccc;
   border-radius: 10px;
+  box-sizing: border-box;
 }
 
 
 /* =========================
-   🔘 BOTÓN PRINCIPAL (AGREGAR LIBRO)
+   🔘 BOTÓN
    ========================= */
+
 button {
   background: #5aa9e6;
   color: white;
@@ -111,29 +116,25 @@ button {
 
 
 /* =========================
-   🌙 MODO OSCURO (SISTEMA GLOBAL)
+   🌙 DARK MODE
    ========================= */
 
-/* 📦 FONDO DEL FORMULARIO EN DARK MODE */
 :global(.page.dark) .form {
   background: #1e293b;
-  margin: -5%;
 }
 
-/* 🏷️ TÍTULO EN DARK MODE */
 :global(.page.dark) .title {
   color: #5aa9e6;
 }
 
-/* ✏️ INPUTS EN DARK MODE */
 :global(.page.dark) input {
   background: #0f172a;
   color: white;
   border: 1px solid #334155;
 }
 
-/* 🔘 BOTÓN EN DARK MODE */
 :global(.page.dark) button {
   background: #3b82f6;
 }
+
 </style>

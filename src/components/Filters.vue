@@ -44,13 +44,17 @@ function resetFilters() {
 
 function parseCustomDate(dateStr) {
   if (!dateStr) return null
+
   const date = new Date(dateStr)
+
   if (isNaN(date.getTime())) return null
+
   return date
 }
 
 function getTimeRemaining(dueDate) {
   const due = parseCustomDate(dueDate)
+
   if (!due) return 'Fecha inválida'
 
   const now = new Date(nowTick.value)
@@ -68,6 +72,7 @@ function getTimeRemaining(dueDate) {
 
 function getDueAlert(dueDate) {
   const due = parseCustomDate(dueDate)
+
   if (!due) return null
 
   const now = new Date(nowTick.value)
@@ -99,6 +104,7 @@ function handleLoan(data) {
     selectedCopyId.value,
     data
   )
+
   showModal.value = false
 }
 
@@ -167,7 +173,7 @@ function getCopyCount(book) {
 </script>
 
 <template>
-  <div class="page">
+  <div class="filters-page">
 
     <!-- 🔎 FILTROS -->
     <div class="filters-panel">
@@ -175,16 +181,32 @@ function getCopyCount(book) {
       <h2>🔎 Filtros</h2>
 
       <div class="filters-grid">
-        <input v-model="search" placeholder="Buscar libro..." />
+
+        <input
+          v-model="search"
+          placeholder="Buscar libro..."
+        />
 
         <select v-model="categoryFilter">
           <option value="">Todas las categorías</option>
-          <option v-for="c in categories" :key="c">{{ c }}</option>
+
+          <option
+            v-for="c in categories"
+            :key="c"
+          >
+            {{ c }}
+          </option>
         </select>
 
         <select v-model="shelfFilter">
           <option value="">Todos los estantes</option>
-          <option v-for="s in shelves" :key="s">{{ s }}</option>
+
+          <option
+            v-for="s in shelves"
+            :key="s"
+          >
+            {{ s }}
+          </option>
         </select>
 
         <select v-model="sortBy">
@@ -199,6 +221,7 @@ function getCopyCount(book) {
         <button @click="resetFilters">
           🔄 Reset
         </button>
+
       </div>
 
     </div>
@@ -212,17 +235,31 @@ function getCopyCount(book) {
         :key="book.id"
       >
 
+        <!-- 📖 HEADER -->
         <div class="book-header">
-          <h3>📖 {{ book.title }}</h3>
+
+          <h3>
+            📖 {{ book.title }}
+          </h3>
 
           <span v-if="getCopyCount(book) > 1">
             {{ getCopyCount(book) }} copias
           </span>
+
         </div>
 
-        <p class="meta">✍️ {{ book.editor }}</p>
-        <p class="meta">🏷️ {{ book.category }}</p>
-        <p class="meta">📦 {{ book.shelf }}</p>
+        <!-- 📌 INFO -->
+        <p class="meta">
+          ✍️ {{ book.editor }}
+        </p>
+
+        <p class="meta">
+          🏷️ {{ book.category }}
+        </p>
+
+        <p class="meta">
+          📦 {{ book.shelf }}
+        </p>
 
         <hr />
 
@@ -242,10 +279,15 @@ function getCopyCount(book) {
           </p>
 
           <p v-else-if="copy.status === 'borrowed'">
-            🟡 {{ copy.borrower }} ({{ copy.cedula }})
+            🟡 {{ copy.borrower }}
+            ({{ copy.cedula }})
+
             <br />
+
             📅 {{ copy.dueDate }}
+
             <br />
+
             ⏳ {{ getTimeRemaining(copy.dueDate) }}
           </p>
 
@@ -284,19 +326,22 @@ function getCopyCount(book) {
 <style scoped>
 
 /* =========================
-   🌞 CONTENEDOR GENERAL (PÁGINA)
+   🌞 CONTENEDOR GENERAL
    ========================= */
-.page {
+
+.filters-page {
   background: #f5f7fb;
   min-height: 100vh;
   padding: 16px;
   font-family: Arial, sans-serif;
+  box-sizing: border-box;
 }
 
 
 /* =========================
    📦 PANEL DE FILTROS
    ========================= */
+
 .filters-panel {
   background: white;
   padding: 14px;
@@ -306,8 +351,33 @@ function getCopyCount(book) {
 
 
 /* =========================
+   🔤 TEXTO LEGIBLE (MODO CLARO)
+   ========================= */
+
+.filters-page h2,
+.filters-page h3,
+.filters-page p,
+.filters-page span,
+.filters-page option,
+.filters-page select,
+.filters-page input {
+  color: #1e293b;
+}
+
+
+/* =========================
+   ✏️ PLACEHOLDERS
+   ========================= */
+
+.filters-page input::placeholder {
+  color: #64748b;
+}
+
+
+/* =========================
    📐 GRID DE FILTROS
    ========================= */
+
 .filters-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -316,8 +386,9 @@ function getCopyCount(book) {
 
 
 /* =========================
-   📚 CONTENEDOR DE LIBROS
+   📚 CONTENEDOR LIBROS
    ========================= */
+
 .books-container {
   display: flex;
   flex-direction: column;
@@ -326,8 +397,9 @@ function getCopyCount(book) {
 
 
 /* =========================
-   📦 TARJETA DE LIBRO
+   📦 TARJETA LIBRO
    ========================= */
+
 .book-card {
   background: white;
   padding: 14px;
@@ -336,8 +408,9 @@ function getCopyCount(book) {
 
 
 /* =========================
-   🧾 ENCABEZADO DE LIBRO
+   📖 HEADER LIBRO
    ========================= */
+
 .book-header {
   display: flex;
   justify-content: space-between;
@@ -345,8 +418,9 @@ function getCopyCount(book) {
 
 
 /* =========================
-   📌 METADATOS (AUTOR, ETC)
+   📌 METADATOS
    ========================= */
+
 .meta {
   opacity: 0.7;
   margin: 2px 0;
@@ -354,8 +428,9 @@ function getCopyCount(book) {
 
 
 /* =========================
-   📦 BLOQUE DE COPIAS
+   📦 BLOQUE COPIAS
    ========================= */
+
 .copy-block {
   margin-top: 10px;
   padding: 8px;
@@ -364,30 +439,34 @@ function getCopyCount(book) {
 
 
 /* =========================
-   🌙 MODO OSCURO (SISTEMA GLOBAL)
+   🔘 BOTONES
    ========================= */
 
-/* 🌑 FONDO GENERAL */
-:global(.page.dark) {
+button {
+  margin-right: 6px;
+}
+
+
+/* =========================
+   🌙 DARK MODE
+   ========================= */
+
+:global(.page.dark) .filters-page {
   background: #121b30;
   color: #e5e7eb;
 }
 
-
-/* 📦 PANEL DE FILTROS EN DARK MODE */
 :global(.page.dark) .filters-panel {
   background: #1e293b;
 }
 
-
-/* 📚 TARJETAS DE LIBRO EN DARK MODE */
 :global(.page.dark) .book-card {
   background: #1e293b;
   color: #e5e7eb;
 }
 
-/* 📦 BLOQUES DE COPIAS EN DARK MODE */
 :global(.page.dark) .copy-block {
   border-left: 3px solid #334155;
 }
+
 </style>
