@@ -23,10 +23,37 @@ onUnmounted(() => {
   clearInterval(interval)
 })
 
+/* =========================
+   📕 PRÉSTAMO MODAL
+   ========================= */
 const showModal = ref(false)
 const selectedBookId = ref(null)
 const selectedCopyId = ref(null)
 
+/* =========================
+   ↩️ DEVOLUCIÓN INLINE (NUEVO REAL)
+   ========================= */
+const activeReturn = ref({
+  bookId: null,
+  copyId: null
+})
+
+function openReturn(bookId, copyId) {
+  activeReturn.value = { bookId, copyId }
+}
+
+function confirmReturn() {
+  store.returnCopy(
+    activeReturn.value.bookId,
+    activeReturn.value.copyId
+  )
+
+  activeReturn.value = { bookId: null, copyId: null }
+}
+
+/* =========================
+   📚 DATA
+   ========================= */
 const categories = computed(() =>
   [...new Set(store.books.map(b => b.category))]
 )
@@ -35,6 +62,9 @@ const shelves = computed(() =>
   [...new Set(store.books.map(b => b.shelf))]
 )
 
+/* =========================
+   🔄 RESET
+   ========================= */
 function resetFilters() {
   categoryFilter.value = ''
   shelfFilter.value = ''
@@ -42,19 +72,18 @@ function resetFilters() {
   search.value = ''
 }
 
+/* =========================
+   ⏳ TIEMPO
+   ========================= */
 function parseCustomDate(dateStr) {
   if (!dateStr) return null
-
   const date = new Date(dateStr)
-
   if (isNaN(date.getTime())) return null
-
   return date
 }
 
 function getTimeRemaining(dueDate) {
   const due = parseCustomDate(dueDate)
-
   if (!due) return 'Fecha inválida'
 
   const now = new Date(nowTick.value)
@@ -72,7 +101,6 @@ function getTimeRemaining(dueDate) {
 
 function getDueAlert(dueDate) {
   const due = parseCustomDate(dueDate)
-
   if (!due) return null
 
   const now = new Date(nowTick.value)
@@ -86,6 +114,9 @@ function getDueAlert(dueDate) {
   return null
 }
 
+/* =========================
+   📕 PRÉSTAMO
+   ========================= */
 function openLoanModal(bookId, copyId) {
   selectedBookId.value = bookId
   selectedCopyId.value = copyId
@@ -108,6 +139,9 @@ function handleLoan(data) {
   showModal.value = false
 }
 
+/* =========================
+   🔎 FILTROS
+   ========================= */
 const filteredBooks = computed(() => {
   let books = store.books
 
@@ -133,37 +167,6 @@ const filteredBooks = computed(() => {
     )
   }
 
-  if (sortBy.value === 'title-asc') {
-    books = [...books].sort((a, b) =>
-      a.title.localeCompare(b.title)
-    )
-  }
-
-  if (sortBy.value === 'title-desc') {
-    books = [...books].sort((a, b) =>
-      b.title.localeCompare(a.title)
-    )
-  }
-
-  if (sortBy.value === 'availability') {
-    books = [...books].sort((a, b) =>
-      b.copies.some(c => c.status === 'available') -
-      a.copies.some(c => c.status === 'available')
-    )
-  }
-
-  if (sortBy.value === 'copies') {
-    books = [...books].sort((a, b) =>
-      b.copies.length - a.copies.length
-    )
-  }
-
-  if (sortBy.value === 'recent') {
-    books = [...books].sort((a, b) =>
-      b.id - a.id
-    )
-  }
-
   return books
 })
 
@@ -175,55 +178,36 @@ function getCopyCount(book) {
 <template>
   <div class="filters-page">
 
-    <!-- 🔎 FILTROS -->
+    <!-- 📊 FILTROS -->
     <div class="filters-panel">
 
-      <h2>🔎 Filtros</h2>
+      <h2 class="panel-title">
+        🔎 Panel de Búsqueda y Filtros
+      </h2>
 
       <div class="filters-grid">
 
-        <input
-          v-model="search"
-          placeholder="Buscar libro..."
-        />
+        <input v-model="search" placeholder="Título del libro..." />
 
         <select v-model="categoryFilter">
-          <option value="">Todas las categorías</option>
-
-          <option
-            v-for="c in categories"
-            :key="c"
-          >
+          <option value="">Todas</option>
+          <option v-for="c in categories" :key="c">
             {{ c }}
           </option>
         </select>
 
         <select v-model="shelfFilter">
-          <option value="">Todos los estantes</option>
-
-          <option
-            v-for="s in shelves"
-            :key="s"
-          >
+          <option value="">Todos</option>
+          <option v-for="s in shelves" :key="s">
             {{ s }}
           </option>
         </select>
 
-        <select v-model="sortBy">
-          <option value="">Sin orden</option>
-          <option value="title-asc">A - Z</option>
-          <option value="title-desc">Z - A</option>
-          <option value="availability">Disponibilidad</option>
-          <option value="copies">Copias</option>
-          <option value="recent">Recientes</option>
-        </select>
-
         <button @click="resetFilters">
-          🔄 Reset
+          🔄 Limpiar
         </button>
 
       </div>
-
     </div>
 
     <!-- 📚 LIBROS -->
@@ -235,31 +219,15 @@ function getCopyCount(book) {
         :key="book.id"
       >
 
-        <!-- 📖 HEADER -->
+        <!-- 📖 HEADER LIBRO -->
         <div class="book-header">
-
-          <h3>
-            📖 {{ book.title }}
-          </h3>
-
-          <span v-if="getCopyCount(book) > 1">
-            {{ getCopyCount(book) }} copias
-          </span>
-
+          <h3>📖 {{ book.title }}</h3>
+          <span>{{ getCopyCount(book) }} copias</span>
         </div>
 
-        <!-- 📌 INFO -->
-        <p class="meta">
-          ✍️ {{ book.editor }}
-        </p>
-
-        <p class="meta">
-          🏷️ {{ book.category }}
-        </p>
-
-        <p class="meta">
-          📦 {{ book.shelf }}
-        </p>
+        <p class="meta">✍️ {{ book.editor }}</p>
+        <p class="meta">🏷️ {{ book.category }}</p>
+        <p class="meta">📦 {{ book.shelf }}</p>
 
         <hr />
 
@@ -270,42 +238,60 @@ function getCopyCount(book) {
           :key="copy.id"
         >
 
+          <!-- ALERTAS -->
           <p v-if="getDueAlert(copy.dueDate)">
             {{ getDueAlert(copy.dueDate) }}
           </p>
 
+          <!-- ESTADO -->
           <p v-if="copy.status === 'available'">
             🟢 Disponible
           </p>
 
           <p v-else-if="copy.status === 'borrowed'">
-            🟡 {{ copy.borrower }}
-            ({{ copy.cedula }})
-
+            🟡 {{ copy.borrower }} ({{ copy.cedula }})
             <br />
-
             📅 {{ copy.dueDate }}
-
             <br />
-
             ⏳ {{ getTimeRemaining(copy.dueDate) }}
           </p>
 
-          <p v-else>
-            🔴 Vencido
-          </p>
-
-          <button @click="handleAction(book.id, copy)">
+          <!-- 📚 PRESTAR -->
+          <button
+            v-if="copy.status === 'available'"
+            @click="handleAction(book.id, copy)"
+          >
             📚 Prestar
           </button>
 
-          <button @click="store.addCopy(book.id)">
-            ➕ Agregar
+          <!-- ↩️ DEVOLVER -->
+          <button
+            v-else-if="copy.status === 'borrowed'"
+            @click="openReturn(book.id, copy.id)"
+          >
+            ↩️ Devolver
           </button>
 
-          <button @click="store.removeCopy(book.id, copy.id)">
-            ➖ Quitar
-          </button>
+          <!-- ➕ ➖ COPIAS -->
+          <button @click="store.addCopy(book.id)">➕</button>
+          <button @click="store.removeCopy(book.id, copy.id)">➖</button>
+
+          <!-- 🔥 CONFIRMACIÓN INLINE (JUSTO AQUÍ ABAJO DE LA COPIA) -->
+          <div
+            v-if="activeReturn.bookId === book.id && activeReturn.copyId === copy.id"
+            class="return-box"
+          >
+
+            <p>¿Se ha devuelto el libro?</p>
+
+            <div class="return-actions">
+              <button @click="confirmReturn">✔ Sí</button>
+              <button @click="activeReturn = { bookId: null, copyId: null }">
+                ❌ No
+              </button>
+            </div>
+
+          </div>
 
         </div>
 
@@ -313,7 +299,7 @@ function getCopyCount(book) {
 
     </div>
 
-    <!-- 📦 MODAL -->
+    <!-- 📕 PRÉSTAMO MODAL -->
     <LoanModal
       v-if="showModal"
       @close="showModal = false"
@@ -324,148 +310,159 @@ function getCopyCount(book) {
 </template>
 
 <style scoped>
-
 /* =========================
-   🌞 CONTENEDOR GENERAL
+   🌐 CONTENEDOR GENERAL
    ========================= */
-
 .filters-page {
   background: #f5f7fb;
   min-height: 100vh;
-  padding: 16px;
-  font-family: Arial, sans-serif;
-  box-sizing: border-box;
+  padding: 18px;
+  font-family: 'Inter', Arial, sans-serif;
+  color: #0f172a;
 }
 
-
 /* =========================
-   📦 PANEL DE FILTROS
+   📊 PANEL
    ========================= */
-
 .filters-panel {
-  background: white;
-  padding: 14px;
-  border-radius: 10px;
-  margin-bottom: 16px;
+  background: #ffffff;
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
 }
 
-
 /* =========================
-   🔤 TEXTO LEGIBLE (MODO CLARO)
+   📐 GRID FILTROS
    ========================= */
-
-.filters-page h2,
-.filters-page h3,
-.filters-page p,
-.filters-page span,
-.filters-page option,
-.filters-page select,
-.filters-page input {
-  color: #1e293b;
-}
-
-
-/* =========================
-   ✏️ PLACEHOLDERS
-   ========================= */
-
-.filters-page input::placeholder {
-  color: #64748b;
-}
-
-
-/* =========================
-   📐 GRID DE FILTROS
-   ========================= */
-
 .filters-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
 }
 
-
 /* =========================
-   📚 CONTENEDOR LIBROS
+   📚 LIBROS → GRID PRO
    ========================= */
-
 .books-container {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+/* 📦 CARD PRO */
+.book-card {
+  background: #ffffff;
+  padding: 14px;
+  border-radius: 14px;
+
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+
+  color: #0f172a;
+
   display: flex;
   flex-direction: column;
-  gap: 12px;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-
-/* =========================
-   📦 TARJETA LIBRO
-   ========================= */
-
-.book-card {
-  background: white;
-  padding: 14px;
-  border-radius: 10px;
+.book-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
 }
 
-
-/* =========================
-   📖 HEADER LIBRO
-   ========================= */
-
+/* 📖 HEADER */
 .book-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
+.copies {
+  font-size: 12px;
+  color: #475569;
+}
 
-/* =========================
-   📌 METADATOS
-   ========================= */
-
+/* 📌 META */
 .meta {
-  opacity: 0.7;
-  margin: 2px 0;
+  font-size: 13px;
+  color: #334155;
+  margin: 3px 0;
 }
 
-
-/* =========================
-   📦 BLOQUE COPIAS
-   ========================= */
-
+/* 📦 COPIAS */
 .copy-block {
   margin-top: 10px;
-  padding: 8px;
-  border-left: 3px solid #ddd;
+  padding: 10px;
+  border-left: 3px solid #e5e7eb;
+  background: #f8fafc;
+  border-radius: 8px;
 }
-
 
 /* =========================
    🔘 BOTONES
    ========================= */
-
 button {
-  margin-right: 6px;
+  margin-top: 6px;
+  padding: 8px;
+  border-radius: 8px;
+
+  border: none;
+  background: #3b82f6;
+  color: white;
+
+  cursor: pointer;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  transition: 0.2s;
 }
 
+button:hover {
+  background: #2563eb;
+}
+
+/* =========================
+   📱 RESPONSIVE (IMPORTANTE)
+   ========================= */
+@media (max-width: 1100px) {
+  .books-container {
+    grid-template-columns: repeat(2, 1fr); /* tablet */
+  }
+}
+
+@media (max-width: 700px) {
+  .books-container {
+    grid-template-columns: 1fr; /* móvil */
+  }
+}
 
 /* =========================
    🌙 DARK MODE
    ========================= */
-
 :global(.page.dark) .filters-page {
-  background: #121b30;
+  background: #0b1220;
   color: #e5e7eb;
 }
 
-:global(.page.dark) .filters-panel {
-  background: #1e293b;
-}
-
+:global(.page.dark) .filters-panel,
 :global(.page.dark) .book-card {
-  background: #1e293b;
+  background: #0b1220; /* más profundo, casi “dashboard” */
   color: #e5e7eb;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+:global(.page.dark) .copies {
+  color: #94a3b8;
+}
+
+:global(.page.dark) .meta {
+  color: #cbd5e1;
 }
 
 :global(.page.dark) .copy-block {
+  background: #0f172a;
   border-left: 3px solid #334155;
 }
 

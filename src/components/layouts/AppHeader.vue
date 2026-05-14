@@ -1,22 +1,51 @@
 <template>
   <header class="app-header">
 
-    <!-- 📚 IZQUIERDA -->
+    <!-- 📚 IZQUIERDA: IDENTIDAD -->
     <div class="left-section">
 
-      <!-- 🖼️ LOGO -->
       <div class="logo-container">
-        <img
-          :src="logo"
-          alt="Rafael Urdaneta"
-          class="logo"
-        />
+        <img :src="logo" alt="logo" class="logo" />
       </div>
 
-      <!-- 📝 TEXTO -->
       <div class="title-container">
-        <h1>📚 Gestor de Libros</h1>
-        <p>Biblioteca Escolar – Rafael Urdaneta</p>
+        <h1 class="main-title">
+          📚 Biblioteca Escolar
+        </h1>
+
+        <p class="subtitle">
+          Unidad Educativa Gral. Rafael Urdaneta
+        </p>
+      </div>
+
+    </div>
+
+    <!-- 📊 CENTRO: DASHBOARD -->
+    <div class="dashboard">
+
+      <div class="kpi">
+        <span class="value">{{ totalBooks }}</span>
+        <span class="label">Libros</span>
+      </div>
+
+      <div class="kpi">
+        <span class="value">{{ totalCopies }}</span>
+        <span class="label">Copias</span>
+      </div>
+
+      <div class="kpi green">
+        <span class="value">{{ availableCopies }}</span>
+        <span class="label">Disponibles</span>
+      </div>
+
+      <div class="kpi yellow">
+        <span class="value">{{ borrowedCopies }}</span>
+        <span class="label">Prestados</span>
+      </div>
+
+      <div class="kpi red">
+        <span class="value">{{ overdueCopies }}</span>
+        <span class="label">Vencidos</span>
       </div>
 
     </div>
@@ -24,10 +53,7 @@
     <!-- 🌙 DERECHA -->
     <div class="right-section">
 
-      <button
-        class="theme-button"
-        @click="$emit('toggle-theme')"
-      >
+      <button class="theme-button" @click="$emit('toggle-theme')">
         {{ isDark ? '☀️ Claro' : '🌙 Oscuro' }}
       </button>
 
@@ -37,145 +63,219 @@
 </template>
 
 <script setup>
-
-/* 🖼️ IMPORTAR LOGO */
 import logo from '../../assets/logo_liceo.jpg'
 
 defineProps({
-  isDark: Boolean
+  isDark: Boolean,
+
+  totalBooks: Number,
+  totalCopies: Number,
+  availableCopies: Number,
+  borrowedCopies: Number,
+  overdueCopies: Number
 })
 
-defineEmits([
-  'toggle-theme'
-])
+defineEmits(['toggle-theme'])
 </script>
 
 <style scoped>
 
 /* =========================
-   🏫 HEADER PRINCIPAL (MODO CLARO)
+   🧊 HEADER PRINCIPAL
    ========================= */
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 20px;
-  background: #1f3a5f; /* azul institucional serio */
+  justify-content: space-between;
+
+  padding: 14px 22px;
+
+  background: rgba(31, 58, 95, 0.92);
+  backdrop-filter: blur(10px);
+
   color: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
 
-
-/* =========================
-   🖼️ CONTENEDOR DEL LOGO
-   ========================= */
-.logo-container {
-  display: flex;
-  align-items: center;
-}
-
-
-/* =========================
-   🏷️ LOGO INSTITUCIONAL
-   ========================= */
-.logo {
-  width: 44px;
-  height: 44px;
-  object-fit: contain;
-  border-radius: 6px;
-  background: white;
-  padding: 4px;
-}
-
-
-/* =========================
-   📝 TEXTO DEL HEADER
-   ========================= */
-.title-container h1 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.title-container p {
-  margin: 0;
-  font-size: 12px;
-  opacity: 0.85;
-}
-
-
-/* =========================
-   🌙 MODO OSCURO (SISTEMA GLOBAL)
-   ========================= */
-
-/* 🏫 HEADER EN DARK MODE */
-:global(.page.dark) .app-header {
-  background: #0f172a; /* azul oscuro institucional */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-}
-
-
-/* 🖼️ LOGO EN DARK MODE (MEJOR CONTRASTE) */
-:global(.page.dark) .logo {
-  background: #e5e7eb;
-}
-
-
-/* 📝 TEXTO EN DARK MODE */
-:global(.page.dark) .title-container h1 {
-  color: #ffffff;
-}
-
-:global(.page.dark) .title-container p {
-  color: #cbd5e1;
+  min-height: 84px;
 }
 
 /* =========================
-   📦 LADO IZQUIERDO
+   📦 IZQUIERDA
    ========================= */
 .left-section {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
+/* =========================
+   🖼️ LOGO (más sólido)
+   ========================= */
+.logo-container {
+  width: 56px;
+  height: 56px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255,255,255,0.12);
+  border-radius: 12px;
+
+  backdrop-filter: blur(6px);
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
 
 /* =========================
-   📦 LADO DERECHO
+   📝 TEXTO MÁS LEGIBLE
+   ========================= */
+.title-container {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.main-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* =========================
+   📊 DASHBOARD (SEPARADO PRO)
+   ========================= */
+.dashboard {
+  display: flex;
+  align-items: center;
+
+  gap: 22px;          /* 🔥 separación fuerte entre KPIs */
+  padding: 0 24px;    /* 🔥 aire lateral */
+}
+
+/* =========================
+   📦 KPI CARD
+   ========================= */
+.kpi {
+  text-align: center;
+
+  padding: 10px 16px;
+
+  min-width: 85px;
+
+  border-radius: 14px;
+
+  background: rgba(255,255,255,0.10);
+  backdrop-filter: blur(6px);
+
+  transition: all 0.2s ease;
+
+  position: relative;
+}
+
+/* ✨ HOVER SUAVE */
+.kpi:hover {
+  transform: translateY(-3px);
+  background: rgba(255,255,255,0.16);
+}
+
+/* =========================
+   🔢 VALOR KPI
+   ========================= */
+.kpi .value {
+  display: block;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+/* =========================
+   🏷️ LABEL KPI
+   ========================= */
+.kpi .label {
+  font-size: 11px;
+  opacity: 0.85;
+  margin-top: 4px;
+}
+
+/* =========================
+   🎨 INDICADORES MÁS VISIBLES
+   ========================= */
+.kpi.green {
+  border-bottom: 3px solid #22c55e;
+}
+
+.kpi.yellow {
+  border-bottom: 3px solid #f59e0b;
+}
+
+.kpi.red {
+  border-bottom: 3px solid #ef4444;
+}
+
+/* =========================
+   🌙 DERECHA
    ========================= */
 .right-section {
   display: flex;
   align-items: center;
-  margin-left: auto;
 }
-
 
 /* =========================
-   🔘 BOTÓN DE TEMA
+   🔘 BOTÓN TEMA
    ========================= */
 .theme-button {
-  background: rgba(255,255,255,0.15);
-  border: none;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+
   color: white;
-  padding: 8px 10px;
-  border-radius: 10px;
+
+  padding: 9px 14px;
+  border-radius: 12px;
+
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.2s;
-  font-size: 15px;
+
+  transition: all 0.2s ease;
 }
 
-/* ✨ HOVER */
 .theme-button:hover {
-  background: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.18);
+  transform: translateY(-2px);
 }
 
+/* =========================
+   🌙 DARK MODE
+   ========================= */
+:global(.page.dark) .app-header {
+  background: rgba(15, 23, 42, 0.95);
+}
 
-/* 🌙 DARK MODE */
+:global(.page.dark) .kpi {
+  background: rgba(255,255,255,0.06);
+}
+
 :global(.page.dark) .theme-button {
-  background: #1e293b;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 :global(.page.dark) .theme-button:hover {
-  background: #334155;
+  background: rgba(51, 65, 85, 0.8);
 }
+
 </style>

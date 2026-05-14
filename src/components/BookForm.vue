@@ -63,48 +63,46 @@ function addBook() {
 <style scoped>
 
 /* =========================
-   📦 CONTENEDOR PRINCIPAL
+   📦 CONTENEDOR PRINCIPAL (LIGHT)
    ========================= */
-
 .form {
-  background: rgb(255, 255, 255);
+  background: #ffffff;
   padding: 15px;
   border-radius: 20px;
   max-width: 100%;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
 }
-
 
 /* =========================
    🏷️ TÍTULO
    ========================= */
-
 .title {
   margin-bottom: 15px;
   font-size: 25px;
-  color: rgb(0, 0, 0);
-  transition: 0.3s;
+  color: #0f172a;
+  transition: 0.25s;
 }
-
 
 /* =========================
    ✏️ INPUTS
    ========================= */
-
 input {
   display: block;
   width: 100%;
   margin-bottom: 10px;
   padding: 10px;
-  border: 3px solid #ccc;
+  border: 2px solid #d1d5db;
   border-radius: 10px;
   box-sizing: border-box;
+  background: #ffffff;
+  color: #0f172a;
+  transition: 0.2s;
 }
-
 
 /* =========================
    🔘 BOTÓN
    ========================= */
-
 button {
   background: #5aa9e6;
   color: white;
@@ -112,29 +110,36 @@ button {
   padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
+  transition: 0.2s;
 }
 
+/* =========================================================
+   🌙 DARK MODE (CORRECTO Y REALMENTE OSCURO)
+   ========================================================= */
 
-/* =========================
-   🌙 DARK MODE
-   ========================= */
-
+/* 🔥 ESTE ES EL CAMBIO CLAVE */
 :global(.page.dark) .form {
-  background: #1e293b;
+  background: #0b1220;   /* negro tipo dashboard */
+  border: 1px solid #1f2937;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
 }
 
+/* título en dark */
 :global(.page.dark) .title {
-  color: #5aa9e6;
+  color: #e5e7eb;
 }
 
+/* inputs en dark */
 :global(.page.dark) input {
   background: #0f172a;
-  color: white;
+  color: #e5e7eb;
   border: 1px solid #334155;
 }
 
+/* botón en dark */
 :global(.page.dark) button {
   background: #3b82f6;
+  color: #ffffff;
 }
 
 </style>
