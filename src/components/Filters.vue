@@ -231,69 +231,86 @@ function getCopyCount(book) {
 
         <hr />
 
-        <!-- 📦 COPIAS -->
-        <div
-          class="copy-block"
-          v-for="copy in book.copies"
-          :key="copy.id"
-        >
+   <!-- 📦 COPIAS -->
+<div
+  class="copy-block"
+  :class="copy.status"
+  v-for="copy in book.copies"
+  :key="copy.id"
+>
 
-          <!-- ALERTAS -->
-          <p v-if="getDueAlert(copy.dueDate)">
-            {{ getDueAlert(copy.dueDate) }}
-          </p>
+  <!-- ALERTAS -->
+  <p v-if="getDueAlert(copy.dueDate)">
+    {{ getDueAlert(copy.dueDate) }}
+  </p>
 
-          <!-- ESTADO -->
-          <p v-if="copy.status === 'available'">
-            🟢 Disponible
-          </p>
+  <!-- ESTADO -->
+  <p v-if="copy.status === 'available'">
+    🟢 Disponible
+  </p>
 
-          <p v-else-if="copy.status === 'borrowed'">
-            🟡 {{ copy.borrower }} ({{ copy.cedula }})
-            <br />
-            📅 {{ copy.dueDate }}
-            <br />
-            ⏳ {{ getTimeRemaining(copy.dueDate) }}
-          </p>
+  <p v-else-if="copy.status === 'borrowed'">
+    🟡 {{ copy.borrower }} ({{ copy.cedula }})
+    <br />
+    📅 {{ copy.dueDate }}
+    <br />
+    ⏳ {{ getTimeRemaining(copy.dueDate) }}
+  </p>
 
-          <!-- 📚 PRESTAR -->
-          <button
-            v-if="copy.status === 'available'"
-            @click="handleAction(book.id, copy)"
-          >
-            📚 Prestar
-          </button>
+  <!-- 📚 PRESTAR -->
+  <button
+    v-if="copy.status === 'available'"
+    @click="handleAction(book.id, copy)"
+  >
+    📚 Prestar
+  </button>
 
-          <!-- ↩️ DEVOLVER -->
-          <button
-            v-else-if="copy.status === 'borrowed'"
-            @click="openReturn(book.id, copy.id)"
-          >
-            ↩️ Devolver
-          </button>
+  <!-- ↩️ DEVOLVER -->
+  <button
+    v-else-if="copy.status === 'borrowed'"
+    @click="openReturn(book.id, copy.id)"
+  >
+    ↩️ Devolver
+  </button>
 
-          <!-- ➕ ➖ COPIAS -->
-          <button @click="store.addCopy(book.id)">➕</button>
-          <button @click="store.removeCopy(book.id, copy.id)">➖</button>
+  <!-- ➕ ➖ SOLO SI ESTÁ DISPONIBLE -->
+  <template v-if="copy.status === 'available'">
 
-          <!-- 🔥 CONFIRMACIÓN INLINE (JUSTO AQUÍ ABAJO DE LA COPIA) -->
-          <div
-            v-if="activeReturn.bookId === book.id && activeReturn.copyId === copy.id"
-            class="return-box"
-          >
+    <button @click="store.addCopy(book.id)">
+      ➕
+    </button>
 
-            <p>¿Se ha devuelto el libro?</p>
+    <button @click="store.removeCopy(book.id, copy.id)">
+      ➖
+    </button>
 
-            <div class="return-actions">
-              <button @click="confirmReturn">✔ Sí</button>
-              <button @click="activeReturn = { bookId: null, copyId: null }">
-                ❌ No
-              </button>
-            </div>
+  </template>
 
-          </div>
+  <!-- 🔥 CONFIRMACIÓN INLINE -->
+  <div
+    v-if="activeReturn.bookId === book.id && activeReturn.copyId === copy.id"
+    class="return-box"
+  >
 
-        </div>
+    <p>¿Se ha devuelto el libro?</p>
+
+    <div class="return-actions">
+
+      <button @click="confirmReturn">
+        ✔ Sí
+      </button>
+
+      <button
+        @click="activeReturn = { bookId: null, copyId: null }"
+      >
+        ❌ No
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
       </div>
 
@@ -362,13 +379,14 @@ function getCopyCount(book) {
 
   display: flex;
   flex-direction: column;
+  transition: all 0.25s ease;
 
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .book-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
 }
 
 /* 📖 HEADER */
@@ -398,6 +416,18 @@ function getCopyCount(book) {
   background: #f8fafc;
   border-radius: 8px;
 }
+.copy-block.available {
+  border-left-color: #22c55e;
+}
+
+.copy-block.borrowed {
+  border-left-color: #f59e0b;
+}
+
+.copy-block.overdue {
+  border-left-color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+}
 
 /* =========================
    🔘 BOTONES
@@ -416,13 +446,25 @@ button {
   font-size: 12px;
   font-weight: 600;
 
-  transition: 0.2s;
+  transition: all 0.2s ease;
+  transform: translateY(0);
 }
 
 button:hover {
-  background: #2563eb;
+    background: #2563eb;
+
+  transform: translateY(-1px);
 }
 
+button:active {
+  transform: translateY(1px);
+  opacity: 0.9;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 /* =========================
    📱 RESPONSIVE (IMPORTANTE)
    ========================= */
@@ -466,4 +508,13 @@ button:hover {
   border-left: 3px solid #334155;
 }
 
+input, select {
+  transition: all 0.2s ease;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
 </style>

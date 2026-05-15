@@ -157,68 +157,160 @@ function submit() {
 </template>
 
 <style scoped>
+
+/* =========================
+   🌑 OVERLAY (CENTRO REAL GLOBAL)
+   ========================= */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+
   display: flex;
   justify-content: center;
   align-items: center;
+
+  background: rgba(0, 0, 0, 0.35); /* puedes ajustar opacidad */
   z-index: 999;
+
+  pointer-events: auto;
 }
 
+/* =========================
+   📦 MODAL CARD (CENTRADO AUTOMÁTICO)
+   ========================= */
 .modal-card {
-  background: #fff;
-  color: #111;
-  padding: 20px;
-  border-radius: 12px;
   width: 320px;
-  transition: 0.3s;
+
+  padding: 20px;
+  border-radius: 14px;
+
+  background: #ffffff;
+  color: #111827;
+
+  box-shadow: 0 12px 35px rgba(0,0,0,0.18);
+
+  transition: 0.2s ease;
 }
 
+/* =========================
+   🌙 DARK MODE (SOLO ESTÉTICA)
+   ========================= */
 .modal-card.dark {
-  background: #1e1e1e;
-  color: #f1f1f1;
+  background: #0f172a;
+  color: #f1f5f9;
+
+  border: 1px solid #334155;
+
+  box-shadow: 0 12px 35px rgba(0,0,0,0.55);
 }
 
+/* =========================
+   ✏️ INPUTS
+   ========================= */
 .modal-card input {
   width: 100%;
   margin: 6px 0;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  padding: 9px;
+
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+
+  box-sizing: border-box;
 }
 
 .modal-card.dark input {
-  background: #2a2a2a;
+  background: #111827;
   color: white;
-  border: 1px solid #444;
+  border: 1px solid #334155;
 }
 
+/* =========================
+   🔘 ACTIONS
+   ========================= */
 .actions {
   display: flex;
   justify-content: space-between;
+  gap: 10px;
   margin-top: 15px;
 }
 
+/* =========================
+   🚨 ERROR MODAL
+   ========================= */
 .error-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+
   display: flex;
   justify-content: center;
   align-items: center;
+
+  background: rgba(0,0,0,0.6);
   z-index: 1000;
 }
 
 .error-card {
-  background: #fff;
+  background: white;
   padding: 20px;
   border-radius: 10px;
 }
 
 .error-card.dark {
-  background: #222;
-  color: #fff;
+  background: #111827;
+  color: white;
+  border: 1px solid #334155;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-overlay {
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-card {
+  animation: popIn 0.25s ease;
+}
+
+button {
+  transition: all 0.2s ease;
+  transform: translateY(0);
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(1px);
+  opacity: 0.9;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+input, select {
+  transition: all 0.2s ease;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
 }
 </style>

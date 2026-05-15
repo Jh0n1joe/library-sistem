@@ -110,9 +110,23 @@ button {
   padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.2s ease;
+  transform: translateY(0);
 }
 
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(1px);
+  opacity: 0.9;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 /* =========================================================
    🌙 DARK MODE (CORRECTO Y REALMENTE OSCURO)
    ========================================================= */
@@ -140,6 +154,16 @@ button {
 :global(.page.dark) button {
   background: #3b82f6;
   color: #ffffff;
+}
+
+input, select {
+  transition: all 0.2s ease;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
 }
 
 </style>
