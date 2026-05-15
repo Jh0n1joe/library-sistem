@@ -8,32 +8,28 @@ const title = ref('')
 const editor = ref('')
 const category = ref('')
 const shelf = ref('')
+const errorMessage = ref('') // 🚨 Nueva variable reactiva para el banner de error
 
 function addBook() {
+  errorMessage.value = '' // Limpiamos errores previos al presionar el botón
+
   if (
     !title.value.trim() ||
     !editor.value.trim() ||
     !category.value.trim() ||
     !shelf.value.trim()
   ) {
-    alert('❌ Debes completar todos los campos')
+    // Cambiamos el alert por nuestro mensaje profesional
+    errorMessage.value = 'Debes completar todos los campos.'
     return
   }
 
+  // Enviamos los datos limpios. Las copias e ID ahora los maneja Supabase por seguridad
   store.addBook({
     title: title.value,
     editor: editor.value,
     category: category.value,
-    shelf: shelf.value,
-
-    copies: [
-      {
-        id: Date.now(),
-        status: 'available',
-        borrower: null,
-        date: null
-      }
-    ]
+    shelf: shelf.value
   })
 
   title.value = ''
@@ -53,6 +49,13 @@ function addBook() {
     <input v-model="category" placeholder="Categoría" />
     <input v-model="shelf" placeholder="Estante" />
 
+    <transition name="fade">
+      <div v-if="errorMessage" class="error-banner">
+        <span class="error-icon">⚠️</span>
+        <p class="error-text">{{ errorMessage }}</p>
+      </div>
+    </transition>
+
     <button @click="addBook">
       Agregar libro
     </button>
@@ -61,7 +64,6 @@ function addBook() {
 </template>
 
 <style scoped>
-
 /* =========================
    📦 CONTENEDOR PRINCIPAL (LIGHT)
    ========================= */
@@ -127,10 +129,36 @@ button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* =========================================================
+   🌟 DISEÑO DEL BANNER DE ERROR (ADAPTADO A TU ESTILO)
+   ========================================================= */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-left: 5px solid #ef4444;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.error-icon {
+  font-size: 16px;
+}
+
+.error-text {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #991b1b;
+}
+
 /* =========================================================
    🌙 DARK MODE (CORRECTO Y REALMENTE OSCURO)
    ========================================================= */
-
 /* 🔥 ESTE ES EL CAMBIO CLAVE */
 :global(.page.dark) .form {
   background: #0b1220;   /* negro tipo dashboard */
@@ -156,6 +184,16 @@ button:disabled {
   color: #ffffff;
 }
 
+/* Ajustes del banner de error en modo oscuro */
+:global(.page.dark) .error-banner {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+:global(.page.dark) .error-text {
+  color: #fca5a5;
+}
+
 input, select {
   transition: all 0.2s ease;
 }
@@ -166,4 +204,12 @@ input:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
 }
 
+/* Animación de desvanecimiento suave */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
 </style>

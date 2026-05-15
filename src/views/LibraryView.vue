@@ -1,7 +1,6 @@
 <template>
   <div :class="['page', { dark: isDark }]">
 
-    <!-- 🏫 HEADER CON DASHBOARD -->
     <AppHeader
       :isDark="isDark"
       @toggle-theme="toggleTheme"
@@ -13,10 +12,8 @@
       :overdueCopies="overdueCopies"
     />
 
-    <!-- 🔍 CONTENIDO PRINCIPAL -->
     <main class="container">
 
-      <!-- 📚 BLOQUE SUPERIOR -->
       <section class="top-section">
 
         <h2 class="title">
@@ -27,7 +24,6 @@
 
       </section>
 
-      <!-- 🔎 FILTROS -->
       <section class="filters-section">
         <Filters />
       </section>
@@ -110,8 +106,15 @@ function detectSystemTheme() {
   })
 }
 
+/* =========================================================
+   📥 INICIALIZACIÓN COMPLETA (TEMA OSCURO + BASE DE DATOS)
+   ========================================================= */
 onMounted(() => {
+  // 1. Detecta si el sistema de la PC está en modo oscuro
   detectSystemTheme()
+
+  // 2. Trae de golpe todos los libros y copias desde Supabase
+  store.fetchBooks()
 })
 </script>
 

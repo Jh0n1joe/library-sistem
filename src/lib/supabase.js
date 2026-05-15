@@ -1,9 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-// 1. Aquí pones la URL que vimos en tu panel principal
 const supabaseUrl = 'https://hojyseoprjeuepeujdkp.supabase.co'
-
-// 2. AQUÍ DEBES PEGAR TU CLAVE ANON / PUBLIC KEY
 const supabaseKey = 'sb_publishable_jD7BsMu-yMh1cb5RGPDV5w_Iw_0h9ai'
 
+// Revisa que esta línea tenga el "export" antes del "const"
 export const supabase = createClient(supabaseUrl, supabaseKey)

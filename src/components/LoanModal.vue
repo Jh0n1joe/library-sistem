@@ -87,7 +87,6 @@ function submit() {
 
 <template>
 
-  <!-- 🌑 MODAL OVERLAY -->
   <div class="modal-overlay">
 
     <div
@@ -97,14 +96,12 @@ function submit() {
 
       <h2>📚 Registrar préstamo</h2>
 
-      <!-- 👤 NOMBRE -->
       <input
         v-model="name"
         @keydown="blockNumbersInName"
         placeholder="Nombre y apellido del estudiante"
       />
 
-      <!-- 🪪 CÉDULA -->
       <input
         v-model="cedula"
         @keydown="blockLettersInCedula"
@@ -112,7 +109,6 @@ function submit() {
         placeholder="Cédula de identidad"
       />
 
-      <!-- 📅 FECHA (sin pasado + max 9999) -->
       <input
         type="date"
         v-model="dueDate"
@@ -122,11 +118,11 @@ function submit() {
 
       <div class="actions">
 
-        <button @click="$emit('close')">
+        <button class="btn-secondary" @click="$emit('close')">
           Cancelar
         </button>
 
-        <button @click="submit">
+        <button class="btn-primary" @click="submit">
           Confirmar
         </button>
 
@@ -136,7 +132,6 @@ function submit() {
 
   </div>
 
-  <!-- 🚨 ERROR MODAL -->
   <div v-if="showError" class="error-overlay">
 
     <div
@@ -146,7 +141,7 @@ function submit() {
 
       <h3>⚠️ {{ errorMessage }}</h3>
 
-      <button @click="showError = false">
+      <button class="btn-danger" @click="showError = false">
         OK
       </button>
 
@@ -169,7 +164,7 @@ function submit() {
   justify-content: center;
   align-items: center;
 
-  background: rgba(0, 0, 0, 0.35); /* puedes ajustar opacidad */
+  background: rgba(0, 0, 0, 0.4);
   z-index: 999;
 
   pointer-events: auto;
@@ -179,9 +174,9 @@ function submit() {
    📦 MODAL CARD (CENTRADO AUTOMÁTICO)
    ========================= */
 .modal-card {
-  width: 320px;
+  width: 340px;
 
-  padding: 20px;
+  padding: 24px;
   border-radius: 14px;
 
   background: #ffffff;
@@ -192,14 +187,21 @@ function submit() {
   transition: 0.2s ease;
 }
 
+.modal-card h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
 /* =========================
    🌙 DARK MODE (SOLO ESTÉTICA)
    ========================= */
 .modal-card.dark {
-  background: #0f172a;
+  background: #0b1220;
   color: #f1f5f9;
 
-  border: 1px solid #334155;
+  border: 1px solid #1f2937;
 
   box-shadow: 0 12px 35px rgba(0,0,0,0.55);
 }
@@ -209,17 +211,18 @@ function submit() {
    ========================= */
 .modal-card input {
   width: 100%;
-  margin: 6px 0;
-  padding: 9px;
+  margin: 8px 0;
+  padding: 10px 12px;
 
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  border: 2px solid #d1d5db;
 
   box-sizing: border-box;
+  font-size: 14px;
 }
 
 .modal-card.dark input {
-  background: #111827;
+  background: #0f172a;
   color: white;
   border: 1px solid #334155;
 }
@@ -229,9 +232,101 @@ function submit() {
    ========================= */
 .actions {
   display: flex;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* =========================================================
+   🔲 NUEVOS ESTILOS PROFESIONALES PARA BOTONES
+   ========================================================= */
+button {
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 🔵 Botón Primario (Confirmar) */
+.btn-primary {
+  background: #5aa9e6;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(90, 169, 230, 0.2);
+}
+
+.btn-primary:hover {
+  background: #4693cd;
+  box-shadow: 0 4px 12px rgba(90, 169, 230, 0.35);
+}
+
+.modal-card.dark .btn-primary {
+  background: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.modal-card.dark .btn-primary:hover {
+  background: #2563eb;
+}
+
+/* ⚪ Botón Secundario (Cancelar) */
+.btn-secondary {
+  background: transparent;
+  color: #64748b;
+  border: 2px solid #cbd5e1;
+  padding: 8px 16px; /* Ajuste por el grosor del borde */
+}
+
+.btn-secondary:hover {
+  background: #f8fafc;
+  color: #334155;
+  border-color: #94a3b8;
+}
+
+.modal-card.dark .btn-secondary {
+  color: #94a3b8;
+  border-color: #334155;
+}
+
+.modal-card.dark .btn-secondary:hover {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+/* 🔴 Botón Alerta (OK Error) */
+.btn-danger {
+  background: #ef4444;
+  color: white;
+  width: 100%;
   margin-top: 15px;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.error-card.dark .btn-danger {
+  background: #ea580c;
+}
+
+.error-card.dark .btn-danger:hover {
+  background: #d97706;
 }
 
 /* =========================
@@ -247,20 +342,38 @@ function submit() {
 
   background: rgba(0,0,0,0.6);
   z-index: 1000;
+  animation: fadeIn 0.2s ease;
 }
 
 .error-card {
   background: white;
-  padding: 20px;
-  border-radius: 10px;
+  padding: 24px;
+  border-radius: 14px;
+  width: 280px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  animation: popIn 0.25s ease;
+}
+
+.error-card h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #111827;
 }
 
 .error-card.dark {
-  background: #111827;
+  background: #0b1220;
   color: white;
-  border: 1px solid #334155;
+  border: 1px solid #1f2937;
 }
 
+.error-card.dark h3 {
+  color: #f3f4f6;
+}
+
+/* =========================
+   🧠 ANIMACIONES
+   ========================= */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -283,25 +396,6 @@ function submit() {
 
 .modal-card {
   animation: popIn 0.25s ease;
-}
-
-button {
-  transition: all 0.2s ease;
-  transform: translateY(0);
-}
-
-button:hover {
-  transform: translateY(-1px);
-}
-
-button:active {
-  transform: translateY(1px);
-  opacity: 0.9;
-}
-
-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
 }
 
 input, select {
